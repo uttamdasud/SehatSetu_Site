@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+:root,
 [data-color-theme='palette-preview'] {
   --color-slate-50: #fffef5;
   --color-slate-100: #fbf8df;
