@@ -1,32 +1,19 @@
-import React, { useState } from 'react';
-import { MapPin, Navigation, X, Check, Search } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { MapPin, Navigation, X, Check, Search, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { INDIAN_CITIES } from '../../data/mockData';
+import { INDIAN_STATES_AND_CITIES } from '../../data/mockData';
+
+const ALL_STATES = Object.keys(INDIAN_STATES_AND_CITIES);
 
 export const LocationModal: React.FC = () => {
   const { showLocationModal, setShowLocationModal, currentLocation, setCurrentLocation, showToast } = useApp();
   const [citySearch, setCitySearch] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
 
   if (!showLocationModal) return null;
 
-  const filteredCities = INDIAN_CITIES.filter((city) =>
-    city.toLowerCase().includes(citySearch.toLowerCase())
-  );
-
-  const handleSelectCity = (city: string) => {
-    let state = 'India';
-    if (city === 'Agartala') state = 'Tripura';
-    else if (city === 'Guwahati' || city === 'Silchar') state = 'Assam';
-    else if (city === 'Kolkata') state = 'West Bengal';
-    else if (city === 'Delhi') state = 'NCR';
-    else if (city === 'Mumbai' || city === 'Pune') state = 'Maharashtra';
-    else if (city === 'Bengaluru') state = 'Karnataka';
-    else if (city === 'Hyderabad') state = 'Telangana';
-    else if (city === 'Chennai') state = 'Tamil Nadu';
-    else if (city === 'Jaipur') state = 'Rajasthan';
-    else if (city === 'Shillong') state = 'Meghalaya';
-
+  const handleSelectCity = (city: string, state: string) => {
     setCurrentLocation({
       city,
       state,
@@ -42,22 +29,48 @@ export const LocationModal: React.FC = () => {
       navigator.geolocation.getCurrentPosition(
         () => {
           setIsDetecting(false);
-          // Set to Agartala or detected city
-          handleSelectCity('Agartala');
+          handleSelectCity('Agartala', 'Tripura');
         },
         () => {
           setIsDetecting(false);
-          // Fallback to Agartala default
-          handleSelectCity('Agartala');
+          handleSelectCity('Agartala', 'Tripura');
         },
         { timeout: 3000 }
       );
     } else {
       setTimeout(() => {
         setIsDetecting(false);
-        handleSelectCity('Agartala');
+        handleSelectCity('Agartala', 'Tripura');
       }, 1000);
     }
+  };
+
+  // Search results: match states and cities
+  const searchResults = useMemo(() => {
+    if (!citySearch.trim()) return null;
+    const query = citySearch.toLowerCase();
+    const results: { city: string; state: string }[] = [];
+
+    for (const [state, cities] of Object.entries(INDIAN_STATES_AND_CITIES)) {
+      // If state name matches, add all its cities
+      const stateMatches = state.toLowerCase().includes(query);
+      for (const city of cities) {
+        if (stateMatches || city.toLowerCase().includes(query)) {
+          results.push({ city, state });
+        }
+      }
+    }
+    return results;
+  }, [citySearch]);
+
+  const isSearching = citySearch.trim().length > 0;
+
+  // Filtered states (for browsing without search)
+  const filteredStates = ALL_STATES;
+  const citiesForState = selectedState ? INDIAN_STATES_AND_CITIES[selectedState] || [] : [];
+
+  const handleBack = () => {
+    setSelectedState(null);
   };
 
   return (
@@ -121,39 +134,134 @@ export const LocationModal: React.FC = () => {
             <input
               id="city-search-input"
               type="text"
-              placeholder="Search Indian city (e.g. Agartala, Kolkata)..."
+              placeholder="Search state or city (e.g. Maharashtra, Agartala)..."
               value={citySearch}
-              onChange={(e) => setCitySearch(e.target.value)}
+              onChange={(e) => { setCitySearch(e.target.value); setSelectedState(null); }}
               className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white"
             />
           </div>
         </div>
 
-        {/* Popular Cities Grid */}
+        {/* Content Area */}
         <div className="flex-1 overflow-y-auto pt-2 no-scrollbar">
-          <div className="grid grid-cols-2 gap-2 pb-4">
-            {filteredCities.map((city) => {
-              const isSelected = currentLocation.city === city;
-              return (
-                <button
-                  key={city}
-                  id={`city-select-${city.toLowerCase()}`}
-                  onClick={() => handleSelectCity(city)}
-                  className={`p-3 rounded-xl border text-left flex items-center justify-between text-sm transition-all ${
-                    isSelected
-                      ? 'bg-emerald-800 text-white border-emerald-800 font-semibold shadow-xs'
-                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-emerald-300' : 'text-slate-400'}`} />
-                    <span>{city}</span>
+          {isSearching ? (
+            /* Search Results */
+            <>
+              {searchResults && searchResults.length > 0 ? (
+                <>
+                  <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    {searchResults.length} result{searchResults.length !== 1 ? 's' : ''} found
                   </div>
-                  {isSelected && <Check className="w-4 h-4 text-emerald-300" />}
-                </button>
-              );
-            })}
-          </div>
+                  <div className="grid grid-cols-1 gap-1.5 pb-4">
+                    {searchResults.map(({ city, state }) => {
+                      const isSelected = currentLocation.city === city && currentLocation.state === state;
+                      return (
+                        <button
+                          key={`${state}-${city}`}
+                          onClick={() => handleSelectCity(city, state)}
+                          className={`p-3 rounded-xl border text-left flex items-center justify-between text-sm transition-all ${
+                            isSelected
+                              ? 'bg-emerald-800 text-white border-emerald-800 font-semibold shadow-xs'
+                              : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-2">
+                            <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${isSelected ? 'text-emerald-300' : 'text-slate-400'}`} />
+                            <div>
+                              <span className="font-medium">{city}</span>
+                              <span className={`text-xs ml-1.5 ${isSelected ? 'text-emerald-200' : 'text-slate-400'}`}>
+                                {state}
+                              </span>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-emerald-300" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8 text-slate-400">
+                  <MapPin className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                  <p className="text-sm font-medium">No results found</p>
+                  <p className="text-xs mt-1">Try a different state or city name</p>
+                </div>
+              )}
+            </>
+          ) : selectedState ? (
+            /* Cities in selected state */
+            <>
+              <button
+                onClick={handleBack}
+                className="flex items-center space-x-1.5 text-sm text-emerald-700 font-semibold mb-3 hover:text-emerald-900 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to States</span>
+              </button>
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Cities in {selectedState}
+              </div>
+              <div className="grid grid-cols-2 gap-2 pb-4">
+                {citiesForState.map((city) => {
+                  const isSelected = currentLocation.city === city && currentLocation.state === selectedState;
+                  return (
+                    <button
+                      key={city}
+                      id={`city-select-${city.toLowerCase().replace(/\s+/g, '-')}`}
+                      onClick={() => handleSelectCity(city, selectedState)}
+                      className={`p-3 rounded-xl border text-left flex items-center justify-between text-sm transition-all ${
+                        isSelected
+                          ? 'bg-emerald-800 text-white border-emerald-800 font-semibold shadow-xs'
+                          : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${isSelected ? 'text-emerald-300' : 'text-slate-400'}`} />
+                        <span>{city}</span>
+                      </div>
+                      {isSelected && <Check className="w-4 h-4 text-emerald-300" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            /* States List */
+            <>
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                Select a State / Union Territory
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 pb-4">
+                {filteredStates.map((state) => {
+                  const cityCount = INDIAN_STATES_AND_CITIES[state].length;
+                  const isCurrentState = currentLocation.state === state;
+                  return (
+                    <button
+                      key={state}
+                      id={`state-select-${state.toLowerCase().replace(/\s+/g, '-')}`}
+                      onClick={() => setSelectedState(state)}
+                      className={`p-3 rounded-xl border text-left flex items-center justify-between text-sm transition-all ${
+                        isCurrentState
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                          : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${isCurrentState ? 'text-emerald-600' : 'text-slate-400'}`} />
+                        <div>
+                          <span className="font-medium">{state}</span>
+                          <span className={`text-xs ml-1.5 ${isCurrentState ? 'text-emerald-500' : 'text-slate-400'}`}>
+                            {cityCount} {cityCount === 1 ? 'city' : 'cities'}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className={`w-4 h-4 ${isCurrentState ? 'text-emerald-500' : 'text-slate-300'}`} />
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

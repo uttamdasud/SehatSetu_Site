@@ -297,3 +297,66 @@ export interface DoctorOnboardingRequest {
 }
 
 export type ActiveTab = 'home' | 'find-doctors' | 'appointments' | 'consultations' | 'profile';
+
+export interface LabTestPackage {
+  id: string;
+  name: string;
+  category: 'Full Body' | 'Diabetes' | 'Heart' | 'Thyroid' | 'Vitamins' | 'Women Health' | 'Fever & Infection';
+  testCount: number;
+  parameters: string[];
+  price: number;
+  originalPrice: number;
+  discountPercentage: number;
+  fastingRequired: boolean;
+  fastingHours?: number;
+  reportTurnaroundHours: number;
+  homeCollectionFree: boolean;
+  nablCertified: boolean;
+  popular: boolean;
+  badge?: string;
+  description: string;
+  sampleType: 'Blood' | 'Urine' | 'Blood & Urine';
+}
+
+export interface SurgeryProcedure {
+  id: string;
+  name: string;
+  category: 'General Surgery' | 'Ophthalmology' | 'Urology' | 'Orthopedics' | 'Proctology' | 'Cosmetic';
+  popular: boolean;
+  tagline: string;
+  estimatedCostRange: string;
+  technique: string;
+  recoveryTimeDays: number;
+  hospitalStay: string;
+  insuranceCashlessCovered: boolean;
+  freeFollowupsCount: number;
+  benefits: string[];
+  image: string;
+}
+
+export interface HealthArticle {
+  id: string;
+  title: string;
+  summary: string;
+  content: string[];
+  category: string;
+  readTimeMinutes: number;
+  doctorAuthorName: string;
+  doctorAuthorSpecialty: string;
+  doctorAuthorImage: string;
+  publishedDate: string;
+  coverImage: string;
+  tags: string[];
+  likesCount: number;
+}
+
+export interface CarePlusPlan {
+  id: string;
+  name: string;
+  durationMonths: number;
+  price: number;
+  originalPrice: number;
+  familyMembersCovered: number;
+  benefits: string[];
+  badge?: string;
+}

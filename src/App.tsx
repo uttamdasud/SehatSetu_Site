@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
+import { Footer } from './components/common/Footer';
 import { Toast } from './components/common/Toast';
 import { LocationModal } from './components/common/LocationModal';
 import { NotificationsModal } from './components/notifications/NotificationsModal';
@@ -54,7 +55,7 @@ const MainAppContent: React.FC = () => {
         return <HomeScreen />;
       case 'find-doctors':
         return <FindDoctorsScreen />;
-      case 'consult':
+      case 'consultations':
         return <ConsultationsScreen />;
       case 'appointments':
         return <AppointmentsScreen />;
@@ -71,8 +72,11 @@ const MainAppContent: React.FC = () => {
     activeScreen === 'hospital-detail';
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto w-full max-w-7xl">
+    <div
+      data-color-theme="palette-preview"
+      className="min-h-screen bg-slate-100 text-slate-900 flex flex-col justify-between"
+    >
+      <div className="mx-auto w-full max-w-7xl flex-1">
         {/* Global App Header (hidden in sub-screen views like doctor profile or symptom checker which have their own headers) */}
         {!isFullScreenSubView && <Header onSignIn={() => setShowAuthScreen(true)} />}
 
@@ -86,6 +90,9 @@ const MainAppContent: React.FC = () => {
         <main className="px-4 pb-10 md:px-6">
           {renderActiveScreen()}
         </main>
+
+        {/* Global Footer (shown on main screens) */}
+        {!isFullScreenSubView && <Footer />}
 
         {/* Modals & Overlays */}
         {showLocationModal && <LocationModal />}

@@ -16,9 +16,9 @@ export const BottomNav: React.FC = () => {
 
   const tabs: { id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'find-doctors', label: 'Find Doctors', icon: Search },
-    { id: 'appointments', label: 'Appointments', icon: Calendar },
-    { id: 'consultations', label: 'Consultations', icon: Video },
+    { id: 'find-doctors', label: 'Doctors', icon: Search },
+    { id: 'appointments', label: 'Bookings', icon: Calendar },
+    { id: 'consultations', label: 'Consult', icon: Video },
   ];
 
   const handleTabClick = (tabId: ActiveTab) => {
@@ -35,7 +35,7 @@ export const BottomNav: React.FC = () => {
       aria-label="Main Navigation"
       className="w-full bg-white/95 border border-slate-200 shadow-sm rounded-2xl px-2 py-2"
     >
-      <div className="flex items-center justify-between gap-2 overflow-x-auto">
+      <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id && !activeScreen;
@@ -45,9 +45,9 @@ export const BottomNav: React.FC = () => {
               key={tab.id}
               id={`nav-tab-${tab.id}`}
               onClick={() => handleTabClick(tab.id)}
-              className={`flex min-w-[110px] flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+              className={`flex min-w-[95px] md:min-w-[110px] flex-1 items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-xs md:text-sm font-medium transition-all ${
                 isActive
-                  ? 'bg-emerald-50 text-emerald-800 shadow-sm ring-1 ring-emerald-100'
+                  ? 'bg-emerald-50 text-emerald-800 shadow-sm ring-1 ring-emerald-100 font-bold'
                   : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >

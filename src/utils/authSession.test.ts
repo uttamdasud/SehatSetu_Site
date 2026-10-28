@@ -13,7 +13,7 @@ describe('auth session utilities', () => {
 
   it('logs the user out and clears the session token', () => {
     const session = createAuthSession({ userName: 'Uttam Das', role: 'patient' });
-    const loggedOut = logoutAuthSession(session);
+    const loggedOut = logoutAuthSession();
 
     expect(loggedOut.isAuthenticated).toBe(false);
     expect(loggedOut.userName).toBeNull();

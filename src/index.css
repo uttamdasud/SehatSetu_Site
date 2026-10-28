@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+[data-color-theme='palette-preview'] {
+  --color-slate-50: #fffef5;
+  --color-slate-100: #fbf8df;
+  --color-slate-200: #eae4b9;
+  --color-emerald-50: #fffbd4;
+  --color-emerald-100: #fcea1c;
+  --color-emerald-200: #f4e21b;
+  --color-emerald-300: #e8d51a;
+  --color-emerald-400: #d2c217;
+  --color-emerald-500: #b0a313;
+  --color-emerald-600: #8e8310;
+  --color-emerald-700: #6c640c;
+  --color-emerald-800: #6c640c;
+  --color-emerald-900: #514b08;
+  --color-emerald-950: #393506;
+  --color-teal-700: #6c640c;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
