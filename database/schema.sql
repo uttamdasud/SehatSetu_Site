@@ -208,8 +208,18 @@ CREATE POLICY "Users can manage own profile" ON public.users
 CREATE POLICY "Users can manage own family members" ON public.family_members
     FOR ALL USING (auth.uid() = user_id);
 
+-- Users can view own appointments (and allow patients to book appointments)
 CREATE POLICY "Users can view own appointments" ON public.appointments
-    FOR ALL USING (auth.uid() = user_id OR patient_phone = (SELECT phone FROM public.users WHERE id = auth.uid()));
+    FOR SELECT USING (auth.uid() = user_id OR patient_phone = (SELECT phone FROM public.users WHERE id = auth.uid()) OR auth.uid() IS NULL);
+
+CREATE POLICY "Enable insert for patients booking appointments" ON public.appointments
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Enable update for appointment status" ON public.appointments
+    FOR UPDATE USING (true);
+
+CREATE POLICY "Enable insert for patient consents" ON public.patient_consents
+    FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Users can view own medical records" ON public.medical_records
     FOR ALL USING (auth.uid() = user_id);
