@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
     } else if (destination === 'doctors') {
       setActiveTab('find-doctors');
     } else {
-      setActiveTab('consult');
+      setActiveTab('consultations');
     }
     setIsProfileDrawerOpen(false);
   };

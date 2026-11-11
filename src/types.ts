@@ -160,7 +160,13 @@ export interface DigitalPrescription {
   followUpIn: string;
 }
 
-export type RecordType = 'PRESCRIPTION' | 'LAB_REPORT' | 'MEDICAL_DOC' | 'CONSULTATION';
+export type RecordType =
+  | 'PRESCRIPTION'
+  | 'LAB_REPORT'
+  | 'MEDICAL_DOC'
+  | 'CONSULTATION'
+  | 'SCAN_REPORT'
+  | 'DISCHARGE_SUMMARY';
 
 export interface MedicalRecord {
   id: string;

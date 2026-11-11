@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Bell, Calendar, FileText, CheckCircle2, AlertCircle, CreditCard, Stethoscope, CheckCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { NotificationItem } from '../../types';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 export const NotificationsModal: React.FC = () => {
   const {
@@ -14,6 +15,8 @@ export const NotificationsModal: React.FC = () => {
     setSelectedPrescription,
     prescriptions,
   } = useApp();
+
+  useEscapeKey(() => setShowNotificationsModal(false), showNotificationsModal);
 
   if (!showNotificationsModal) return null;
 

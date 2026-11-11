@@ -20,6 +20,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { SpecialtyType, ApplicantType } from '../../types';
 import { SPECIALTIES, INDIAN_CITIES } from '../../data/mockData';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 const DOCTOR_AVATAR_PRESETS = [
   {
@@ -47,6 +48,8 @@ export const DoctorOnboardingModal: React.FC = () => {
     submitDoctorOnboardingRequest,
     showToast,
   } = useApp();
+
+  useEscapeKey(() => setShowOnboardingModal(false), showOnboardingModal);
 
   const [step, setStep] = useState<'FORM' | 'SUCCESS'>('FORM');
   const [submittedRequestId, setSubmittedRequestId] = useState<string>('');
@@ -138,6 +141,8 @@ export const DoctorOnboardingModal: React.FC = () => {
       languages,
       feeVideo: Number(feeVideo) || 300,
       feeInClinic: Number(feeInClinic) || 400,
+      availableForVideo: Number(feeVideo) > 0,
+      availableForInClinic: true,
       availableDays,
       morningTimings,
       eveningTimings,
@@ -175,6 +180,7 @@ export const DoctorOnboardingModal: React.FC = () => {
           <button
             id="close-onboarding-modal-btn"
             onClick={() => setShowOnboardingModal(false)}
+            aria-label="Close modal"
             className="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />

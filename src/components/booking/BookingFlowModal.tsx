@@ -35,6 +35,7 @@ import {
   generateDoctorDailyRosterWhatsAppText,
   getWhatsAppRosterUrl,
 } from '../../utils/receptionistNotifier';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 export const BookingFlowModal: React.FC = () => {
   const {
@@ -57,17 +58,19 @@ export const BookingFlowModal: React.FC = () => {
 
   const [step, setStep] = useState<number>(1); // 1: Mode/Doctor, 2: Date & Time, 3: Patient, 4: Payment, 5: Confirmation
   const [selectedDayScheduleIndex, setSelectedDayScheduleIndex] = useState<number>(0);
-  const [selectedDate, setSelectedDate] = useState('Today, 24 Aug');
+  const [selectedDate, setSelectedDate] = useState(`Today, ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('10:00 AM');
   const [patientMode, setPatientMode] = useState<'SELF' | 'FAMILY'>('SELF');
   const [selectedFamilyId, setSelectedFamilyId] = useState('fam-1');
 
   // Form Fields
   const [patientName, setPatientName] = useState(userProfile.name);
-  const [patientAge, setPatientAge] = useState(32);
-  const [patientGender, setPatientGender] = useState<'Male' | 'Female' | 'Other'>('Male');
+  const [patientAge, setPatientAge] = useState(userProfile.age || 32);
+  const [patientGender, setPatientGender] = useState<'Male' | 'Female' | 'Other'>(userProfile.gender || 'Male');
   const [patientPhone, setPatientPhone] = useState(userProfile.phone);
-  const [patientAddress, setPatientAddress] = useState('Capital Complex VIP Road, Sector 2, Agartala');
+  const [patientAddress, setPatientAddress] = useState(
+    userProfile.city ? `${userProfile.city}, ${userProfile.state}` : 'Capital Complex VIP Road, Sector 2, Agartala'
+  );
   const [symptomsReason, setSymptomsReason] = useState('');
 
   // Payment
@@ -79,15 +82,17 @@ export const BookingFlowModal: React.FC = () => {
   if (!isBookingOpen || !bookingDraft.doctor) return null;
 
   const doctor = bookingDraft.doctor;
-  const weeklySchedules: DaySchedule[] = doctor.weeklySchedule || [
-    { day: 'Monday', isAvailable: true, timeRange: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'] },
-    { day: 'Tuesday', isAvailable: true, timeRange: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'] },
-    { day: 'Wednesday', isAvailable: true, timeRange: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'] },
-    { day: 'Thursday', isAvailable: true, timeRange: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'] },
-    { day: 'Friday', isAvailable: true, timeRange: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'] },
-    { day: 'Saturday', isAvailable: true, timeRange: '10:00 AM - 02:00 PM', morningSlots: ['10:00 AM', '11:00 AM', '11:30 AM'], afternoonSlots: ['01:00 PM'], eveningSlots: [] },
-    { day: 'Sunday', isAvailable: false, timeRange: 'Closed', morningSlots: [], afternoonSlots: [], eveningSlots: [] },
-  ];
+  const weeklySchedules: DaySchedule[] = (doctor.weeklySchedule && doctor.weeklySchedule.length > 0)
+    ? doctor.weeklySchedule
+    : [
+        { day: 'Monday', shortDay: 'Mon', isAvailable: true, clinicTiming: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'], consultationTypes: ['IN_CLINIC', 'VIDEO'] },
+        { day: 'Tuesday', shortDay: 'Tue', isAvailable: true, clinicTiming: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'], consultationTypes: ['IN_CLINIC', 'VIDEO'] },
+        { day: 'Wednesday', shortDay: 'Wed', isAvailable: true, clinicTiming: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'], consultationTypes: ['IN_CLINIC', 'VIDEO'] },
+        { day: 'Thursday', shortDay: 'Thu', isAvailable: true, clinicTiming: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'], consultationTypes: ['IN_CLINIC', 'VIDEO'] },
+        { day: 'Friday', shortDay: 'Fri', isAvailable: true, clinicTiming: '09:00 AM - 01:00 PM', morningSlots: ['09:30 AM', '10:00 AM', '11:00 AM'], afternoonSlots: ['12:30 PM'], eveningSlots: ['05:00 PM', '06:00 PM'], consultationTypes: ['IN_CLINIC', 'VIDEO'] },
+        { day: 'Saturday', shortDay: 'Sat', isAvailable: true, clinicTiming: '10:00 AM - 02:00 PM', morningSlots: ['10:00 AM', '11:00 AM', '11:30 AM'], afternoonSlots: ['01:00 PM'], eveningSlots: [], consultationTypes: ['IN_CLINIC'] },
+        { day: 'Sunday', shortDay: 'Sun', isAvailable: false, clinicTiming: 'Closed', morningSlots: [], afternoonSlots: [], eveningSlots: [], consultationTypes: [] },
+      ];
 
   const currentDaySchedule = weeklySchedules[selectedDayScheduleIndex] || weeklySchedules[0];
 
@@ -126,6 +131,8 @@ export const BookingFlowModal: React.FC = () => {
     setConfirmedAppointment(null);
   };
 
+  useEscapeKey(handleClose, isBookingOpen);
+
   const executePayment = () => {
     setIsProcessingPayment(true);
 
@@ -137,10 +144,10 @@ export const BookingFlowModal: React.FC = () => {
         date: `${currentDaySchedule.day} (${selectedDate})`,
         timeSlot: selectedTimeSlot,
         patientName: patientMode === 'SELF' ? userProfile.name : patientName,
-        patientAge: patientMode === 'SELF' ? 32 : patientAge,
-        patientGender: patientMode === 'SELF' ? 'Male' : patientGender,
+        patientAge: patientMode === 'SELF' ? (userProfile.age || 32) : patientAge,
+        patientGender: patientMode === 'SELF' ? (userProfile.gender || 'Male') : patientGender,
         patientPhone: patientPhone || userProfile.phone,
-        patientAddress: patientAddress || 'Capital Complex, Agartala',
+        patientAddress: patientAddress || (userProfile.city ? `${userProfile.city}, ${userProfile.state}` : 'Capital Complex, Agartala'),
         relationship:
           patientMode === 'SELF'
             ? 'Self'
@@ -150,7 +157,7 @@ export const BookingFlowModal: React.FC = () => {
         total: onlinePlatformFee,
       };
 
-      const apt = bookAppointment(finalDraft, paymentMethod);
+      const apt = bookAppointment(finalDraft, paymentMethod === 'QR_CODE' ? 'UPI' : paymentMethod);
       setConfirmedAppointment(apt);
       setStep(5);
     }, 1200);
@@ -775,7 +782,7 @@ export const BookingFlowModal: React.FC = () => {
                             <span className="text-xs font-bold text-slate-900 block">
                               UPI App (GPay, PhonePe, Paytm, BHIM)
                             </span>
-                            <span className="text-[10px] text-slate-500">Pay ₹{onlinePlatformFee} to UPI ID: {platformFeeSettings.upiId}</span>
+                            <span className="text-[10px] text-slate-500">Pay ₹{onlinePlatformFee} to UPI ID: {platformFeeSettings.ownerUpiId}</span>
                           </div>
                         </div>
                         <div
@@ -847,7 +854,7 @@ export const BookingFlowModal: React.FC = () => {
                             <QrCode className="w-28 h-28 text-slate-900" />
                           </div>
                           <span className="text-[10px] text-slate-500 font-mono font-bold block">
-                            UPI ID: {platformFeeSettings.upiId}
+                            UPI ID: {platformFeeSettings.ownerUpiId}
                           </span>
                         </div>
                       )}
@@ -944,7 +951,7 @@ export const BookingFlowModal: React.FC = () => {
                 <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-slate-600">
                   <span>Doctor Visiting Fee:</span>
                   <span className="font-bold text-slate-900">
-                    ₹{confirmedAppointment.doctorFee || doctorVisitingFee} (Pay at Clinic)
+                    ₹{confirmedAppointment.doctorFeePayableAtClinic || confirmedAppointment.fee || doctorVisitingFee} (Pay at Clinic)
                   </span>
                 </div>
 

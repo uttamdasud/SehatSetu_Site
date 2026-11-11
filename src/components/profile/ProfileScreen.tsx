@@ -36,7 +36,7 @@ import {
   Stethoscope,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { FamilyMember, MedicalRecord } from '../../types';
+import { FamilyMember, MedicalRecord, RecordType } from '../../types';
 
 export const ProfileScreen: React.FC = () => {
   const {
@@ -70,16 +70,14 @@ export const ProfileScreen: React.FC = () => {
 
   // New Family Member form
   const [newFamName, setNewFamName] = useState('');
-  const [newFamRelation, setNewFamRelation] = useState<'Spouse' | 'Parent' | 'Child' | 'Other'>('Spouse');
+  const [newFamRelation, setNewFamRelation] = useState<FamilyMember['relationship']>('Spouse');
   const [newFamAge, setNewFamAge] = useState('28');
-  const [newFamGender, setNewFamGender] = useState<'Male' | 'Female'>('Female');
+  const [newFamGender, setNewFamGender] = useState<FamilyMember['gender']>('Female');
   const [newFamBlood, setNewFamBlood] = useState('B+');
 
   // New Medical Record form
   const [newRecordTitle, setNewRecordTitle] = useState('');
-  const [newRecordType, setNewRecordType] = useState<
-    'LAB_REPORT' | 'SCAN_REPORT' | 'PRESCRIPTION' | 'DISCHARGE_SUMMARY'
-  >('LAB_REPORT');
+  const [newRecordType, setNewRecordType] = useState<RecordType>('LAB_REPORT');
   const [newRecordHospital, setNewRecordHospital] = useState('ILS Hospital Agartala');
 
   const handleAddFamily = (e: React.FormEvent) => {
@@ -92,6 +90,8 @@ export const ProfileScreen: React.FC = () => {
       age: parseInt(newFamAge) || 30,
       gender: newFamGender,
       bloodGroup: newFamBlood,
+      phone: user.phone || '',
+      allergies: 'None reported',
     });
 
     setShowAddFamilyModal(false);
@@ -105,10 +105,13 @@ export const ProfileScreen: React.FC = () => {
     addMedicalRecord({
       title: newRecordTitle,
       type: newRecordType,
-      date: 'Today, 24 Aug 2026',
+      date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       doctorOrLab: newRecordHospital,
+      patientName: user.name,
       fileSize: '1.8 MB',
       fileType: 'PDF',
+      summary: `${newRecordType.replace('_', ' ')} saved to health locker`,
+      tags: ['Health Record', newRecordType],
     });
 
     setShowUploadRecordModal(false);
@@ -848,12 +851,14 @@ export const ProfileScreen: React.FC = () => {
                   <label className="text-xs font-bold text-slate-700 block mb-1">Relationship</label>
                   <select
                     value={newFamRelation}
-                    onChange={(e) => setNewFamRelation(e.target.value as any)}
+                    onChange={(e) => setNewFamRelation(e.target.value as FamilyMember['relationship'])}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white"
                   >
                     <option value="Spouse">Spouse</option>
-                    <option value="Parent">Parent</option>
+                    <option value="Father">Father</option>
+                    <option value="Mother">Mother</option>
                     <option value="Child">Child</option>
+                    <option value="Sibling">Sibling</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -874,11 +879,12 @@ export const ProfileScreen: React.FC = () => {
                   <label className="text-xs font-bold text-slate-700 block mb-1">Gender</label>
                   <select
                     value={newFamGender}
-                    onChange={(e) => setNewFamGender(e.target.value as any)}
+                    onChange={(e) => setNewFamGender(e.target.value as FamilyMember['gender'])}
                     className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white"
                   >
                     <option value="Female">Female</option>
                     <option value="Male">Male</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
@@ -952,13 +958,15 @@ export const ProfileScreen: React.FC = () => {
                 <label className="text-xs font-bold text-slate-700 block mb-1">Record Type</label>
                 <select
                   value={newRecordType}
-                  onChange={(e) => setNewRecordType(e.target.value as any)}
+                  onChange={(e) => setNewRecordType(e.target.value as RecordType)}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white"
                 >
                   <option value="LAB_REPORT">Lab Test Report</option>
                   <option value="SCAN_REPORT">Radiology / Scan (X-Ray, MRI, CT)</option>
                   <option value="PRESCRIPTION">Previous Prescription</option>
                   <option value="DISCHARGE_SUMMARY">Hospital Discharge Summary</option>
+                  <option value="MEDICAL_DOC">General Medical Document</option>
+                  <option value="CONSULTATION">Consultation Summary</option>
                 </select>
               </div>
 

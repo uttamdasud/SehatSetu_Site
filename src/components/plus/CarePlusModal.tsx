@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { MOCK_CARE_PLUS_PLANS } from '../../data/mockData';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 interface CarePlusModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface CarePlusModalProps {
 }
 
 export const CarePlusModal: React.FC<CarePlusModalProps> = ({ isOpen, onClose }) => {
+  useEscapeKey(onClose, isOpen);
   const { showToast } = useApp();
   const [selectedPlanId, setSelectedPlanId] = useState('plan-family-annual');
   const [isActivated, setIsActivated] = useState(false);
@@ -42,6 +44,7 @@ export const CarePlusModal: React.FC<CarePlusModalProps> = ({ isOpen, onClose })
         <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-600 to-purple-900 p-6 text-white md:p-8">
           <button
             onClick={onClose}
+            aria-label="Close modal"
             className="absolute top-4 right-4 rounded-full bg-black/20 p-1.5 text-white/80 hover:bg-black/40 hover:text-white"
           >
             <X className="h-5 w-5" />

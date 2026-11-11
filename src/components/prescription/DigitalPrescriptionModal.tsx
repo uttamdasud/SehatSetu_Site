@@ -1,9 +1,12 @@
 import React from 'react';
 import { X, Download, Share2, ShieldCheck, FileCheck, Pill, Calendar, User, Stethoscope } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 export const DigitalPrescriptionModal: React.FC = () => {
   const { selectedPrescription, setSelectedPrescription, showToast } = useApp();
+
+  useEscapeKey(() => setSelectedPrescription(null), !!selectedPrescription);
 
   if (!selectedPrescription) return null;
 

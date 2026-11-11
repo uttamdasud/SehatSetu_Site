@@ -21,7 +21,7 @@ export const INITIAL_PLATFORM_FEE_SETTINGS: PlatformFeeSettings = {
   isEnabled: true,
   feeAmount: 0, // Currently ₹0 Free Promotion!
   isPromoFreeMode: true,
-  ownerUpiId: 'uttamdas542@okhdfcbank',
+  ownerUpiId: (typeof import.meta !== 'undefined' && import.meta.env?.VITE_OWNER_UPI_ID) || 'sehatsetu@upi',
   ownerPayeeName: 'SehatSetu Medical Network',
   promoOfferTagline: '🎉 Free Promotional Launch: ₹0 Platform Booking Fee (Doctor Visiting Fee Paid at Clinic)',
 };

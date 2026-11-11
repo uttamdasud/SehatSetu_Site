@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { MapPin, Navigation, X, Check, Search, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { INDIAN_STATES_AND_CITIES } from '../../data/mockData';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 const ALL_STATES = Object.keys(INDIAN_STATES_AND_CITIES);
 
@@ -10,6 +11,8 @@ export const LocationModal: React.FC = () => {
   const [citySearch, setCitySearch] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
   const [selectedState, setSelectedState] = useState<string | null>(null);
+
+  useEscapeKey(() => setShowLocationModal(false), showLocationModal);
 
   if (!showLocationModal) return null;
 

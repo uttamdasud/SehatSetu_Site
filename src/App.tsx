@@ -22,6 +22,17 @@ import { DoctorOnboardingModal } from './components/onboarding/DoctorOnboardingM
 import { ReceptionistRosterModal } from './components/admin/ReceptionistRosterModal';
 import { AuthScreen } from './components/auth/AuthScreen';
 
+// New Feature Modals
+import { OpdLiveTokenModal } from './components/opd/OpdLiveTokenModal';
+import { SpecialistOpdTemplatesModal } from './components/opd/SpecialistOpdTemplatesModal';
+import { AiDiagnosisSuggesterModal } from './components/diagnosis/AiDiagnosisSuggesterModal';
+import { PharmacyLocatorModal } from './components/pharmacy/PharmacyLocatorModal';
+import { MedicineRateComparisonModal } from './components/medicines/MedicineRateComparisonModal';
+import { BodyAnatomyViewerModal } from './components/anatomy/BodyAnatomyViewerModal';
+import { CarcinogenDatabaseModal } from './components/carcinogens/CarcinogenDatabaseModal';
+import { AbhaLinkModal } from './components/abha/AbhaLinkModal';
+import { ExternalRecordsModal } from './components/records/ExternalRecordsModal';
+
 const MainAppContent: React.FC = () => {
   const [showAuthScreen, setShowAuthScreen] = useState(false);
   const {
@@ -35,6 +46,25 @@ const MainAppContent: React.FC = () => {
     showOnboardingModal,
     showReceptionistRosterModal,
     biometricPrompt,
+    // New Feature Modal States
+    showOpdLiveTokenModal,
+    setShowOpdLiveTokenModal,
+    showSpecialistOpdTemplatesModal,
+    setShowSpecialistOpdTemplatesModal,
+    showAiDiagnosisModal,
+    setShowAiDiagnosisModal,
+    showPharmacyLocatorModal,
+    setShowPharmacyLocatorModal,
+    showMedicineComparisonModal,
+    setShowMedicineComparisonModal,
+    showBodyAnatomyModal,
+    setShowBodyAnatomyModal,
+    showCarcinogenDatabaseModal,
+    setShowCarcinogenDatabaseModal,
+    showAbhaLinkModal,
+    setShowAbhaLinkModal,
+    showExternalRecordsModal,
+    setShowExternalRecordsModal,
   } = useApp();
 
   const renderActiveScreen = () => {
@@ -77,7 +107,7 @@ const MainAppContent: React.FC = () => {
       className="min-h-screen bg-slate-100 text-slate-900 flex flex-col justify-between"
     >
       <div className="mx-auto w-full max-w-7xl flex-1">
-        {/* Global App Header (hidden in sub-screen views like doctor profile or symptom checker which have their own headers) */}
+        {/* Global App Header */}
         {!isFullScreenSubView && <Header onSignIn={() => setShowAuthScreen(true)} />}
 
         {!isFullScreenSubView && !activeCall.isActive && (
@@ -94,7 +124,7 @@ const MainAppContent: React.FC = () => {
         {/* Global Footer (shown on main screens) */}
         {!isFullScreenSubView && <Footer />}
 
-        {/* Modals & Overlays */}
+        {/* Existing Modals & Overlays */}
         {showLocationModal && <LocationModal />}
         {showNotificationsModal && <NotificationsModal />}
         {isBookingOpen && <BookingFlowModal />}
@@ -104,6 +134,35 @@ const MainAppContent: React.FC = () => {
         {showReceptionistRosterModal && <ReceptionistRosterModal />}
         {biometricPrompt && biometricPrompt.isOpen && <BiometricAuthModal />}
         {showAuthScreen && <AuthScreen onDismiss={() => setShowAuthScreen(false)} />}
+
+        {/* Advanced OPD & Health Intelligence Modals */}
+        {showOpdLiveTokenModal && (
+          <OpdLiveTokenModal onClose={() => setShowOpdLiveTokenModal(false)} />
+        )}
+        {showSpecialistOpdTemplatesModal && (
+          <SpecialistOpdTemplatesModal onClose={() => setShowSpecialistOpdTemplatesModal(false)} />
+        )}
+        {showAiDiagnosisModal && (
+          <AiDiagnosisSuggesterModal onClose={() => setShowAiDiagnosisModal(false)} />
+        )}
+        {showPharmacyLocatorModal && (
+          <PharmacyLocatorModal onClose={() => setShowPharmacyLocatorModal(false)} />
+        )}
+        {showMedicineComparisonModal && (
+          <MedicineRateComparisonModal onClose={() => setShowMedicineComparisonModal(false)} />
+        )}
+        {showBodyAnatomyModal && (
+          <BodyAnatomyViewerModal onClose={() => setShowBodyAnatomyModal(false)} />
+        )}
+        {showCarcinogenDatabaseModal && (
+          <CarcinogenDatabaseModal onClose={() => setShowCarcinogenDatabaseModal(false)} />
+        )}
+        {showAbhaLinkModal && (
+          <AbhaLinkModal onClose={() => setShowAbhaLinkModal(false)} />
+        )}
+        {showExternalRecordsModal && (
+          <ExternalRecordsModal onClose={() => setShowExternalRecordsModal(false)} />
+        )}
 
         {/* System Toast Alerts */}
         <Toast />

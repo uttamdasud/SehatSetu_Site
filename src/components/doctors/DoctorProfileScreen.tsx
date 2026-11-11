@@ -38,7 +38,29 @@ export const DoctorProfileScreen: React.FC = () => {
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
 
-  if (!selectedDoctor) return null;
+  if (!selectedDoctor) {
+    return (
+      <div className="bg-slate-50 min-h-screen p-6 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white p-6 rounded-3xl border border-slate-200 text-center space-y-4 shadow-sm">
+          <div className="w-12 h-12 bg-emerald-50 text-emerald-800 rounded-2xl mx-auto flex items-center justify-center font-bold">
+            <Building2 className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-900 font-heading">No Doctor Selected</h3>
+            <p className="text-xs text-slate-500 mt-1">Please select a doctor profile from the doctor directory.</p>
+          </div>
+          <button
+            onClick={() => {
+              setActiveScreen(null);
+            }}
+            className="w-full py-2.5 px-4 bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+          >
+            Back to Directory
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const doctor = selectedDoctor;
 
@@ -325,7 +347,7 @@ export const DoctorProfileScreen: React.FC = () => {
                       <div>
                         <span className="text-xs font-bold text-slate-900 block">{currentSched.day} Clinic Schedule</span>
                         <span className="text-[11px] text-slate-500">
-                          {currentSched.isAvailable ? currentSched.timeRange : 'No clinic timings on this day'}
+                          {currentSched.isAvailable ? (currentSched.clinicTiming || currentSched.videoTiming) : 'No clinic timings on this day'}
                         </span>
                       </div>
                       <span

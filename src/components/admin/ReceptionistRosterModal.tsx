@@ -29,6 +29,7 @@ import {
   getWhatsAppRosterUrl,
   getEmailRosterUrl,
 } from '../../utils/receptionistNotifier';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 export const ReceptionistRosterModal: React.FC = () => {
   const {
@@ -50,6 +51,8 @@ export const ReceptionistRosterModal: React.FC = () => {
   const [receptionistPhone, setReceptionistPhone] = useState('');
   const [receptionistEmail, setReceptionistEmail] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  useEscapeKey(() => setShowReceptionistRosterModal(false), showReceptionistRosterModal);
 
   if (!showReceptionistRosterModal) return null;
 
@@ -160,6 +163,7 @@ export const ReceptionistRosterModal: React.FC = () => {
           <button
             id="close-roster-modal-btn"
             onClick={() => setShowReceptionistRosterModal(false)}
+            aria-label="Close modal"
             className="p-1.5 text-white/80 hover:text-white rounded-full hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />

@@ -135,6 +135,26 @@ interface AppContextType {
   showLocationModal: boolean;
   setShowLocationModal: (show: boolean) => void;
 
+  // Advanced OPD & Health Intelligence Modals
+  showOpdLiveTokenModal: boolean;
+  setShowOpdLiveTokenModal: (show: boolean) => void;
+  showSpecialistOpdTemplatesModal: boolean;
+  setShowSpecialistOpdTemplatesModal: (show: boolean) => void;
+  showAiDiagnosisModal: boolean;
+  setShowAiDiagnosisModal: (show: boolean) => void;
+  showPharmacyLocatorModal: boolean;
+  setShowPharmacyLocatorModal: (show: boolean) => void;
+  showMedicineComparisonModal: boolean;
+  setShowMedicineComparisonModal: (show: boolean) => void;
+  showBodyAnatomyModal: boolean;
+  setShowBodyAnatomyModal: (show: boolean) => void;
+  showCarcinogenDatabaseModal: boolean;
+  setShowCarcinogenDatabaseModal: (show: boolean) => void;
+  showAbhaLinkModal: boolean;
+  setShowAbhaLinkModal: (show: boolean) => void;
+  showExternalRecordsModal: boolean;
+  setShowExternalRecordsModal: (show: boolean) => void;
+
   // Language
   currentLanguage: string;
   setCurrentLanguage: (lang: string) => void;
@@ -269,6 +289,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     area: 'Capital Complex',
   });
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showOpdLiveTokenModal, setShowOpdLiveTokenModal] = useState(false);
+  const [showSpecialistOpdTemplatesModal, setShowSpecialistOpdTemplatesModal] = useState(false);
+  const [showAiDiagnosisModal, setShowAiDiagnosisModal] = useState(false);
+  const [showPharmacyLocatorModal, setShowPharmacyLocatorModal] = useState(false);
+  const [showMedicineComparisonModal, setShowMedicineComparisonModal] = useState(false);
+  const [showBodyAnatomyModal, setShowBodyAnatomyModal] = useState(false);
+  const [showCarcinogenDatabaseModal, setShowCarcinogenDatabaseModal] = useState(false);
+  const [showAbhaLinkModal, setShowAbhaLinkModal] = useState(false);
+  const [showExternalRecordsModal, setShowExternalRecordsModal] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('English');
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -280,8 +309,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     state: 'State',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200',
     language: 'Language',
-    age: '12',
-    gender: 'Gender',
+    age: 28,
+    gender: 'Male',
     bloodGroup: 'Blood Group',
     abhaId: '91-8842-9901-4431',
   });
@@ -368,21 +397,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     messages: [],
   });
 
+  const toastTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const callConnectingTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
   // Call timer effect
   useEffect(() => {
-    let timer: any;
+    let timer: NodeJS.Timeout | undefined;
     if (activeCall.isActive && !activeCall.isConnecting) {
       timer = setInterval(() => {
         setActiveCall((prev) => ({ ...prev, durationSeconds: prev.durationSeconds + 1 }));
       }, 1000);
     }
-    return () => clearInterval(timer);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, [activeCall.isActive, activeCall.isConnecting]);
 
   const showToast = (msg: string) => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
     setToastMessage(msg);
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setToastMessage(null);
+      toastTimerRef.current = null;
     }, 3200);
   };
 
@@ -825,103 +863,126 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ],
     });
 
-    setTimeout(() => {
+    if (callConnectingTimerRef.current) {
+      clearTimeout(callConnectingTimerRef.current);
+    }
+
+    callConnectingTimerRef.current = setTimeout(() => {
       setActiveCall((prev) => ({ ...prev, isConnecting: false }));
+      callConnectingTimerRef.current = null;
     }, 2800);
   };
 
   const endCall = () => {
+    if (callConnectingTimerRef.current) {
+      clearTimeout(callConnectingTimerRef.current);
+      callConnectingTimerRef.current = null;
+    }
+
+    const wasConnected = !activeCall.isConnecting && activeCall.durationSeconds > 0;
     const activeDoc = activeCall.doctor || doctors[0] || MOCK_DOCTORS[0];
-    const newRxId = `rx-${Date.now().toString().slice(-4)}`;
 
-    const newPrescription: DigitalPrescription = {
-      id: newRxId,
-      appointmentId: activeCall.appointmentId || 'apt-recent',
-      doctorName: activeDoc.name,
-      doctorSpecialty: activeDoc.specialty,
-      doctorQualifications: activeDoc.qualifications,
-      doctorRegNumber: activeDoc.registrationNumber,
-      doctorHospital: activeDoc.hospital,
-      patientName: userProfile.name,
-      patientAge: 32,
-      patientGender: 'Male',
-      date: 'Today, 24 Aug 2026',
-      diagnosis: 'Acute Symptomatic Management & Telehealth Review',
-      symptomsRecorded: 'Patient consulted via instant video call for seasonal malaise and discomfort.',
-      medicines: [
-        {
-          id: `med-${Date.now()}-1`,
-          name: 'Tab. Paracetamol 650mg',
-          dosage: '650mg',
-          frequency: '1-0-1 (After Food)',
-          duration: '3 Days',
-          instructions: 'Take if temperature exceeds 99°F or headache occurs.',
-        },
-        {
-          id: `med-${Date.now()}-2`,
-          name: 'Tab. Vitamin C + Zinc (Limcee)',
-          dosage: '500mg',
-          frequency: '1-0-0 (Morning)',
-          duration: '10 Days',
-          instructions: 'Chewable tablet with water.',
-        },
-      ],
-      advice: [
-        'Drink plenty of warm liquids.',
-        'Adequate rest for the next 24-48 hours.',
-        'Follow up if symptoms do not improve in 3 days.',
-      ],
-      followUpIn: 'After 3 days if required',
-    };
+    if (wasConnected) {
+      const newRxId = `rx-${Date.now().toString().slice(-4)}`;
+      const currentDateStr = new Date().toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
 
-    setPrescriptions((prev) => [newPrescription, ...prev]);
+      const newPrescription: DigitalPrescription = {
+        id: newRxId,
+        appointmentId: activeCall.appointmentId || 'apt-recent',
+        doctorName: activeDoc.name,
+        doctorSpecialty: activeDoc.specialty,
+        doctorQualifications: activeDoc.qualifications,
+        doctorRegNumber: activeDoc.registrationNumber,
+        doctorHospital: activeDoc.hospital,
+        patientName: userProfile.name,
+        patientAge: userProfile.age || 32,
+        patientGender: userProfile.gender || 'Male',
+        date: currentDateStr,
+        diagnosis: 'Acute Symptomatic Management & Telehealth Review',
+        symptomsRecorded: 'Patient consulted via instant video call for seasonal malaise and discomfort.',
+        medicines: [
+          {
+            id: `med-${Date.now()}-1`,
+            name: 'Tab. Paracetamol 650mg',
+            dosage: '650mg',
+            frequency: '1-0-1 (After Food)',
+            duration: '3 Days',
+            instructions: 'Take if temperature exceeds 99°F or headache occurs.',
+          },
+          {
+            id: `med-${Date.now()}-2`,
+            name: 'Tab. Vitamin C + Zinc (Limcee)',
+            dosage: '500mg',
+            frequency: '1-0-0 (Morning)',
+            duration: '10 Days',
+            instructions: 'Chewable tablet with water.',
+          },
+        ],
+        advice: [
+          'Drink plenty of warm liquids.',
+          'Adequate rest for the next 24-48 hours.',
+          'Follow up if symptoms do not improve in 3 days.',
+        ],
+        followUpIn: 'After 3 days if required',
+      };
 
-    const completedApt: Appointment = {
-      id: activeCall.appointmentId || `apt-${Date.now()}`,
-      doctorId: activeDoc.id,
-      doctorName: activeDoc.name,
-      doctorSpecialty: activeDoc.specialty,
-      doctorImage: activeDoc.image,
-      doctorHospital: activeDoc.hospital,
-      doctorHospitalAddress: activeDoc.hospitalAddress,
-      patientName: userProfile.name,
-      patientAge: 32,
-      patientGender: 'Male',
-      patientPhone: userProfile.phone,
-      patientAddress: 'Capital Complex VIP Road, Agartala',
-      relationshipToUser: 'Self',
-      type: 'VIDEO',
-      date: 'Today, 24 Aug',
-      timeSlot: 'Instant Call',
-      status: 'COMPLETED',
-      serialNumber: calculateDoctorDaySerialNumber(appointments, activeDoc.id, 'Today, 24 Aug'),
-      fee: activeDoc.feeVideo,
-      totalPaid: platformFeeSettings.feeAmount,
-      doctorFeePayableAtClinic: activeDoc.feeInClinic,
-      platformFee: platformFeeSettings.feeAmount,
-      platformFeeStatus: platformFeeSettings.feeAmount === 0 ? 'WAIVED_PROMO' : 'PAID_VIA_UPI',
-      tokenNumber: `TK-${Math.floor(100 + Math.random() * 900)}`,
-      paymentMethod: 'UPI',
-      paymentId: `UPI/SEHAT/${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-      prescriptionId: newRxId,
-      createdDate: 'Today, 24 Aug 2026',
-    };
+      setPrescriptions((prev) => [newPrescription, ...prev]);
 
-    setAppointments((prev) => [completedApt, ...prev]);
+      const completedApt: Appointment = {
+        id: activeCall.appointmentId || `apt-${Date.now()}`,
+        doctorId: activeDoc.id,
+        doctorName: activeDoc.name,
+        doctorSpecialty: activeDoc.specialty,
+        doctorImage: activeDoc.image,
+        doctorHospital: activeDoc.hospital,
+        doctorHospitalAddress: activeDoc.hospitalAddress,
+        patientName: userProfile.name,
+        patientAge: userProfile.age || 32,
+        patientGender: userProfile.gender || 'Male',
+        patientPhone: userProfile.phone,
+        patientAddress: 'Capital Complex VIP Road, Agartala',
+        relationshipToUser: 'Self',
+        type: 'VIDEO',
+        date: currentDateStr,
+        timeSlot: 'Instant Call',
+        status: 'COMPLETED',
+        serialNumber: calculateDoctorDaySerialNumber(appointments, activeDoc.id, currentDateStr),
+        fee: activeDoc.feeVideo,
+        totalPaid: platformFeeSettings.feeAmount,
+        doctorFeePayableAtClinic: activeDoc.feeInClinic,
+        platformFee: platformFeeSettings.feeAmount,
+        platformFeeStatus: platformFeeSettings.feeAmount === 0 ? 'WAIVED_PROMO' : 'PAID_VIA_UPI',
+        tokenNumber: `TK-${Math.floor(100 + Math.random() * 900)}`,
+        paymentMethod: 'UPI',
+        paymentId: `UPI/SEHAT/${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+        prescriptionId: newRxId,
+        createdDate: currentDateStr,
+      };
 
-    const newRecord: MedicalRecord = {
-      id: `rec-${Date.now()}`,
-      title: `Prescription - ${activeDoc.name}`,
-      type: 'PRESCRIPTION',
-      date: 'Today, 24 Aug 2026',
-      doctorOrLab: `${activeDoc.name} (${activeDoc.hospital})`,
-      patientName: userProfile.name,
-      fileSize: '190 KB',
-      fileType: 'PDF',
-      summary: `Telehealth consult prescription generated with ${activeDoc.name}.`,
-      tags: ['Prescription', activeDoc.specialty, 'Telehealth'],
-    };
-    setMedicalRecords((prev) => [newRecord, ...prev]);
+      setAppointments((prev) => [completedApt, ...prev]);
+
+      const newRecord: MedicalRecord = {
+        id: `rec-${Date.now()}`,
+        title: `Prescription - ${activeDoc.name}`,
+        type: 'PRESCRIPTION',
+        date: currentDateStr,
+        doctorOrLab: `${activeDoc.name} (${activeDoc.hospital})`,
+        patientName: userProfile.name,
+        fileSize: '190 KB',
+        fileType: 'PDF',
+        summary: `Telehealth consult prescription generated with ${activeDoc.name}.`,
+        tags: ['Prescription', activeDoc.specialty, 'Telehealth'],
+      };
+      setMedicalRecords((prev) => [newRecord, ...prev]);
+      setSelectedPrescription(newPrescription);
+      showToast('Consultation ended. Digital prescription generated!');
+    } else {
+      showToast('Consultation cancelled');
+    }
 
     setActiveCall({
       isActive: false,
@@ -935,9 +996,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       activeChatDrawer: false,
       messages: [],
     });
-
-    setSelectedPrescription(newPrescription);
-    showToast('Consultation ended. Digital prescription generated!');
   };
 
   const toggleMic = () => {
@@ -1102,6 +1160,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setCurrentLocation,
         showLocationModal,
         setShowLocationModal,
+        showOpdLiveTokenModal,
+        setShowOpdLiveTokenModal,
+        showSpecialistOpdTemplatesModal,
+        setShowSpecialistOpdTemplatesModal,
+        showAiDiagnosisModal,
+        setShowAiDiagnosisModal,
+        showPharmacyLocatorModal,
+        setShowPharmacyLocatorModal,
+        showMedicineComparisonModal,
+        setShowMedicineComparisonModal,
+        showBodyAnatomyModal,
+        setShowBodyAnatomyModal,
+        showCarcinogenDatabaseModal,
+        setShowCarcinogenDatabaseModal,
+        showAbhaLinkModal,
+        setShowAbhaLinkModal,
+        showExternalRecordsModal,
+        setShowExternalRecordsModal,
         currentLanguage,
         setCurrentLanguage,
         biometricSettings,

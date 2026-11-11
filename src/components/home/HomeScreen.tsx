@@ -37,6 +37,12 @@ import {
   Car,
   BookOpen,
   MessageCircle,
+  Percent,
+  ShieldAlert,
+  FileText,
+  FileCheck2,
+  TrendingDown,
+  Pill,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import {
@@ -59,6 +65,15 @@ export const HomeScreen: React.FC = () => {
     setSearchQuery,
     setActiveScreen,
     currentLocation,
+    setShowOpdLiveTokenModal,
+    setShowSpecialistOpdTemplatesModal,
+    setShowAiDiagnosisModal,
+    setShowPharmacyLocatorModal,
+    setShowMedicineComparisonModal,
+    setShowBodyAnatomyModal,
+    setShowCarcinogenDatabaseModal,
+    setShowAbhaLinkModal,
+    setShowExternalRecordsModal,
   } = useApp();
 
   const [isCarePlusOpen, setIsCarePlusOpen] = useState(false);
@@ -449,72 +464,286 @@ export const HomeScreen: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          {/* Card 1: Instant Video Consult */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          {/* Card 1: Realtime OPD Token Counter */}
           <div
-            onClick={() => startInstantConsultation()}
-            className="group cursor-pointer rounded-3xl p-5 border border-blue-200/80 bg-gradient-to-br from-[#AFCFED]/30 via-sky-50 to-white shadow-xs hover:shadow-md hover:border-blue-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+            onClick={() => setShowOpdLiveTokenModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-amber-200/80 bg-gradient-to-br from-amber-100/40 via-amber-50 to-white shadow-xs hover:shadow-md hover:border-amber-300 transition-all active:scale-[0.98] flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3">
-                <span className="rounded-full bg-blue-100 text-blue-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
-                  60 Secs SLA
+                <span className="rounded-full bg-rose-100 text-rose-800 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+                  Live Sync
                 </span>
-                <div className="h-10 w-10 rounded-2xl bg-blue-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-                  <Video className="w-5 h-5" />
+                <div className="h-10 w-10 rounded-2xl bg-amber-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <Users className="w-5 h-5" />
                 </div>
               </div>
 
               <h3 className="text-base font-bold text-slate-900 font-heading">
-                Instant Video Consult
+                Realtime Token Viewing
               </h3>
               <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Connect with verified doctors in under 60 seconds. Digital prescription included.
+                Live chamber queue counter, estimated wait time timer & audio chime when called.
               </p>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-blue-100 flex items-center justify-between text-xs font-bold text-blue-900">
-              <span>From ₹299</span>
+            <div className="mt-4 pt-3 border-t border-amber-100 flex items-center justify-between text-xs font-bold text-amber-900">
+              <span>Chamber 104 Live</span>
               <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
-                Consult Now <ChevronRight className="w-4 h-4" />
+                View Queue <ChevronRight className="w-4 h-4" />
               </span>
             </div>
           </div>
 
-          {/* Card 2: Find In-Clinic Doctors */}
+          {/* Card 2: AI Diagnosis & Nearest Doctors */}
           <div
-            onClick={() => {
-              setSelectedSpecialtyFilter('ALL');
-              setActiveTab('find-doctors');
-            }}
-            className="group cursor-pointer rounded-3xl p-5 border border-teal-200/80 bg-gradient-to-br from-[#98CBD6]/30 via-teal-50 to-white shadow-xs hover:shadow-md hover:border-teal-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+            onClick={() => setShowAiDiagnosisModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-purple-200/80 bg-gradient-to-br from-purple-100/40 via-purple-50 to-white shadow-xs hover:shadow-md hover:border-purple-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-purple-100 text-purple-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  AI Clinical Engine
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-purple-700 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <BrainCircuit className="w-5 h-5 text-purple-200" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                AI Diagnosis & Nearest Doctors
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Describe patient symptoms for differential diagnosis with nearest doctor phone & WhatsApp.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-purple-100 flex items-center justify-between text-xs font-bold text-purple-900">
+              <span>Smart Triage</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                Check Symptoms <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Card 3: Nearest 24x7 Pharmacy Locator */}
+          <div
+            onClick={() => setShowPharmacyLocatorModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-teal-200/80 bg-gradient-to-br from-teal-100/40 via-teal-50 to-white shadow-xs hover:shadow-md hover:border-teal-300 transition-all active:scale-[0.98] flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="rounded-full bg-teal-100 text-teal-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
-                  Confirmed Slots
+                  Google Maps
                 </span>
                 <div className="h-10 w-10 rounded-2xl bg-teal-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-                  <UserCheck className="w-5 h-5" />
+                  <MapPin className="w-5 h-5" />
                 </div>
               </div>
 
               <h3 className="text-base font-bold text-slate-900 font-heading">
-                Find Doctors Near You
+                Nearest Pharmacy Locator
               </h3>
               <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-                Book physical in-clinic visits with verified specialists across your city.
+                24x7 chemists, Jan Aushadhi Kendras, home delivery & direct phone contacts.
               </p>
             </div>
 
             <div className="mt-4 pt-3 border-t border-teal-100 flex items-center justify-between text-xs font-bold text-teal-900">
-              <span>Zero Waiting Fee</span>
+              <span>Directions & Delivery</span>
               <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
-                Find Doctors <ChevronRight className="w-4 h-4" />
+                Find Stores <ChevronRight className="w-4 h-4" />
               </span>
             </div>
           </div>
 
+          {/* Card 4: Medicine Rate & Generic Salt Comparator */}
+          <div
+            onClick={() => setShowMedicineComparisonModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-emerald-200/80 bg-gradient-to-br from-emerald-100/40 via-emerald-50 to-white shadow-xs hover:shadow-md hover:border-emerald-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-emerald-100 text-emerald-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  Save 70-85%
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-emerald-700 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <Percent className="w-5 h-5" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                Medicine Rate & Generic Salt
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Compare brand prices with identical salt Jan Aushadhi generic alternatives.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-emerald-100 flex items-center justify-between text-xs font-bold text-emerald-900">
+              <span>Exact Salt Suggester</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                Compare Rates <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Card 5: Body Anatomy & Epidemiological Atlas */}
+          <div
+            onClick={() => setShowBodyAnatomyModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-sky-200/80 bg-gradient-to-br from-sky-100/40 via-sky-50 to-white shadow-xs hover:shadow-md hover:border-sky-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-sky-100 text-sky-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  India vs Global
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <Activity className="w-5 h-5" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                Body Anatomy & Disease Atlas
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Interactive body systems, disease occurrence stats in India & responsible factors.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-xs font-bold text-sky-900">
+              <span>Epidemiological Data</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                Explore Organs <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Card 6: Know Carcinogens Intelligence */}
+          <div
+            onClick={() => setShowCarcinogenDatabaseModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-rose-200/80 bg-gradient-to-br from-rose-100/40 via-rose-50 to-white shadow-xs hover:shadow-md hover:border-rose-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-rose-100 text-rose-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  WHO / IARC
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-rose-700 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                Know Carcinogenic Database
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Cancer-causing agents (Gutkha, Supari, Bidi, Chulha smoke, Arsenic) & prevention.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-rose-100 flex items-center justify-between text-xs font-bold text-rose-900">
+              <span>Early Warning Signs</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                Learn Risks <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Card 7: Specialist OPD Clinical Templates */}
+          <div
+            onClick={() => setShowSpecialistOpdTemplatesModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-emerald-200/80 bg-gradient-to-br from-emerald-100/30 via-slate-50 to-white shadow-xs hover:shadow-md hover:border-emerald-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-emerald-100 text-emerald-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  Doctor Desk
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-emerald-800 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <FileText className="w-5 h-5" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                Specialist OPD Templates
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Cardiology, Pediatrics, Dermatology & Ortho clinical examination & EMR protocols.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-emerald-100 flex items-center justify-between text-xs font-bold text-emerald-950">
+              <span>Standard EMR Notes</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                Open Templates <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Card 8: ABHA Link & Health Locker */}
+          <div
+            onClick={() => setShowAbhaLinkModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-teal-200/80 bg-gradient-to-br from-teal-100/30 via-slate-50 to-white shadow-xs hover:shadow-md hover:border-teal-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-teal-100 text-teal-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  ABDM Official
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-teal-700 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <ShieldCheck className="w-5 h-5 text-teal-200" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                ABHA ID Link & Health Card
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                National Health Authority 14-digit ABHA card, QR code & digital health locker sync.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-teal-100 flex items-center justify-between text-xs font-bold text-teal-950">
+              <span>91-8842-9901-4431</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                View ABHA <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
+
+          {/* Card 9: Cross-Platform Patient Records */}
+          <div
+            onClick={() => setShowExternalRecordsModal(true)}
+            className="group cursor-pointer rounded-3xl p-5 border border-indigo-200/80 bg-gradient-to-br from-indigo-100/30 via-indigo-50 to-white shadow-xs hover:shadow-md hover:border-indigo-300 transition-all active:scale-[0.98] flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="rounded-full bg-indigo-100 text-indigo-900 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                  FHIR Synced
+                </span>
+                <div className="h-10 w-10 rounded-2xl bg-indigo-700 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+                  <FileCheck2 className="w-5 h-5" />
+                </div>
+              </div>
+
+              <h3 className="text-base font-bold text-slate-900 font-heading">
+                Cross-Platform History
+              </h3>
+              <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                Access consultation notes & diagnostic reports from Apollo 24|7, Practo, & CoWIN.
+              </p>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-indigo-100 flex items-center justify-between text-xs font-bold text-indigo-950">
+              <span>4 External Records</span>
+              <span className="flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                View Records <ChevronRight className="w-4 h-4" />
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 

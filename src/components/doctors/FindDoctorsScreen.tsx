@@ -101,8 +101,8 @@ export const FindDoctorsScreen: React.FC = () => {
       }
 
       // 4. Consultation Mode Filter
-      if (selectedTypeFilter === 'VIDEO' && doc.feeVideo <= 0) return false;
-      if (selectedTypeFilter === 'IN_CLINIC' && doc.feeInClinic <= 0) return false;
+      if (selectedTypeFilter === 'VIDEO' && !doc.availableForVideo) return false;
+      if (selectedTypeFilter === 'IN_CLINIC' && !doc.availableForInClinic) return false;
 
       // 5. City Filter
       if (selectedCity !== 'ALL' && doc.city !== selectedCity) return false;
@@ -473,7 +473,9 @@ export const FindDoctorsScreen: React.FC = () => {
                     <div className="flex items-center space-x-1.5 truncate">
                       <h4 className="text-sm font-bold text-slate-900 truncate font-heading">{doc.name}</h4>
                       {doc.verified && (
-                        <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" title="Verified Specialist" />
+                        <span title="Verified Specialist">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                        </span>
                       )}
                     </div>
 
@@ -704,7 +706,7 @@ export const FindDoctorsScreen: React.FC = () => {
                       <span className="text-xs font-bold text-slate-900 block">{currentSchedule.day} Timings</span>
                       <span className="text-[11px] text-slate-500">
                         {currentSchedule.isAvailable
-                          ? `${currentSchedule.timeRange} • ${scheduleDoctorModal.hospital}`
+                          ? `${currentSchedule.clinicTiming || currentSchedule.videoTiming || 'Consultation Available'} • ${scheduleDoctorModal.hospital}`
                           : 'Doctor is not consulting on this day'}
                       </span>
                     </div>
