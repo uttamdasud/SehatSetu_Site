@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   HeartPulse,
   Phone,
@@ -9,8 +9,12 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { TermsOfServiceModal } from '../legal/TermsOfServiceModal';
+import { PrivacyPolicyModal } from '../legal/PrivacyPolicyModal';
 
 export const Footer: React.FC = () => {
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const {
     setActiveTab,
     setActiveScreen,
@@ -326,19 +330,22 @@ export const Footer: React.FC = () => {
               © 2026 SehatSetu Healthcare Technologies Pvt. Ltd. All rights reserved.
             </div>
             <div className="flex gap-4">
-              <button onClick={() => showToast('Privacy Policy: Zero tracker surveillance.')} className="hover:text-white">
-                Privacy
+              <button onClick={() => setShowPrivacy(true)} className="hover:text-white transition">
+                Privacy Policy
               </button>
-              <button onClick={() => showToast('Terms of Service compliant with Telemedicine Practice Guidelines 2020.')} className="hover:text-white">
-                Terms
+              <button onClick={() => setShowTerms(true)} className="hover:text-white transition">
+                Terms of Service
               </button>
-              <button onClick={() => showToast('Security: ISO 27001, HIPAA & ABDM standards.')} className="hover:text-white">
+              <button onClick={() => showToast('Security: ISO 27001, HIPAA & ABDM standards.')} className="hover:text-white transition">
                 Security
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {showTerms && <TermsOfServiceModal onClose={() => setShowTerms(false)} />}
+      {showPrivacy && <PrivacyPolicyModal onClose={() => setShowPrivacy(false)} />}
     </footer>
   );
 };

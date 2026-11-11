@@ -32,6 +32,7 @@ import { BodyAnatomyViewerModal } from './components/anatomy/BodyAnatomyViewerMo
 import { CarcinogenDatabaseModal } from './components/carcinogens/CarcinogenDatabaseModal';
 import { AbhaLinkModal } from './components/abha/AbhaLinkModal';
 import { ExternalRecordsModal } from './components/records/ExternalRecordsModal';
+import { EmergencyDisclaimerBanner } from './components/legal/EmergencyDisclaimerBanner';
 
 const MainAppContent: React.FC = () => {
   const [showAuthScreen, setShowAuthScreen] = useState(false);
@@ -106,6 +107,9 @@ const MainAppContent: React.FC = () => {
       data-color-theme="palette-preview"
       className="min-h-screen bg-slate-100 text-slate-900 flex flex-col justify-between"
     >
+      {/* NMC Telemedicine Emergency Disclaimer Banner */}
+      <EmergencyDisclaimerBanner />
+
       <div className="mx-auto w-full max-w-7xl flex-1">
         {/* Global App Header */}
         {!isFullScreenSubView && <Header onSignIn={() => setShowAuthScreen(true)} />}

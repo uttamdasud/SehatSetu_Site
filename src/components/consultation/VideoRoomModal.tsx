@@ -21,6 +21,8 @@ import {
   Minimize2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { videoService } from '../../services/videoService';
+import { useEscapeKey } from '../../utils/useEscapeKey';
 
 export const VideoRoomModal: React.FC = () => {
   const {
@@ -39,6 +41,35 @@ export const VideoRoomModal: React.FC = () => {
   const [messageInput, setMessageInput] = useState('');
   const [showToolsDrawer, setShowToolsDrawer] = useState(false);
   const [isPatientPiPMin, setIsPatientPiPMin] = useState(false);
+  const [hasCameraStream, setHasCameraStream] = useState(false);
+  const localVideoRef = React.useRef<HTMLVideoElement>(null);
+
+  const handleEndCall = () => {
+    videoService.stopSession();
+    endCall();
+  };
+
+  useEscapeKey(handleEndCall, activeCall.isActive);
+
+  // Request actual camera stream for patient self-view PiP
+  React.useEffect(() => {
+    let isMounted = true;
+    if (activeCall.isActive && !activeCall.isConnecting) {
+      videoService.getLocalMedia({ video: !activeCall.isVideoOff, audio: !activeCall.isMicMuted }).then((stream) => {
+        if (isMounted && stream && localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+          setHasCameraStream(true);
+        }
+      });
+    }
+
+    return () => {
+      isMounted = false;
+      if (!activeCall.isActive) {
+        videoService.stopSession();
+      }
+    };
+  }, [activeCall.isActive, activeCall.isConnecting]);
 
   if (!activeCall.isActive || !activeCall.doctor) return null;
 
@@ -106,7 +137,7 @@ export const VideoRoomModal: React.FC = () => {
           </div>
 
           <button
-            onClick={endCall}
+            onClick={handleEndCall}
             className="py-2.5 px-6 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-colors"
           >
             Cancel Connection
@@ -182,6 +213,14 @@ export const VideoRoomModal: React.FC = () => {
                   <VideoOff className="w-4 h-4 text-slate-500 mb-1" />
                   <span>Cam Off</span>
                 </div>
+              ) : hasCameraStream ? (
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover scale-x-[-1]"
+                />
               ) : (
                 <img
                   src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300"
@@ -247,7 +286,7 @@ export const VideoRoomModal: React.FC = () => {
             {/* End Call Button */}
             <button
               id="call-end-button"
-              onClick={endCall}
+              onClick={handleEndCall}
               className="p-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full shadow-lg active:scale-95 transition-all"
               title="End Consultation"
             >

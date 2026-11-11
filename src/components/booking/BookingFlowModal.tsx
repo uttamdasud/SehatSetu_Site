@@ -36,6 +36,8 @@ import {
   getWhatsAppRosterUrl,
 } from '../../utils/receptionistNotifier';
 import { useEscapeKey } from '../../utils/useEscapeKey';
+import { paymentService } from '../../services/paymentService';
+import { whatsappService } from '../../services/whatsappService';
 
 export const BookingFlowModal: React.FC = () => {
   const {
@@ -133,20 +135,28 @@ export const BookingFlowModal: React.FC = () => {
 
   useEscapeKey(handleClose, isBookingOpen);
 
-  const executePayment = () => {
+  const executePayment = async () => {
     setIsProcessingPayment(true);
 
-    setTimeout(() => {
-      setIsProcessingPayment(false);
+    try {
+      const patientPhoneNum = patientPhone || userProfile.phone;
+      const patientFullName = patientMode === 'SELF' ? userProfile.name : patientName;
+
+      const paymentResult = await paymentService.processPayment({
+        amount: onlinePlatformFee,
+        doctorName: doctor.name,
+        patientName: patientFullName,
+        patientPhone: patientPhoneNum,
+      });
 
       const finalDraft = {
         ...bookingDraft,
         date: `${currentDaySchedule.day} (${selectedDate})`,
         timeSlot: selectedTimeSlot,
-        patientName: patientMode === 'SELF' ? userProfile.name : patientName,
+        patientName: patientFullName,
         patientAge: patientMode === 'SELF' ? (userProfile.age || 32) : patientAge,
         patientGender: patientMode === 'SELF' ? (userProfile.gender || 'Male') : patientGender,
-        patientPhone: patientPhone || userProfile.phone,
+        patientPhone: patientPhoneNum,
         patientAddress: patientAddress || (userProfile.city ? `${userProfile.city}, ${userProfile.state}` : 'Capital Complex, Agartala'),
         relationship:
           patientMode === 'SELF'
@@ -155,12 +165,21 @@ export const BookingFlowModal: React.FC = () => {
               'Family Member',
         symptoms: symptomsReason,
         total: onlinePlatformFee,
+        paymentId: paymentResult.paymentId,
       };
 
       const apt = bookAppointment(finalDraft, paymentMethod === 'QR_CODE' ? 'UPI' : paymentMethod);
       setConfirmedAppointment(apt);
+
+      // Automated WhatsApp notification dispatch
+      whatsappService.sendPatientBookingConfirmation(apt);
+
       setStep(5);
-    }, 1200);
+    } catch (err: any) {
+      showToast(err.message || 'Payment was cancelled');
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const handleConfirmPay = () => {

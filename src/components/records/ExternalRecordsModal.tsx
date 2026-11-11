@@ -16,6 +16,7 @@ import {
 import { EXTERNAL_PLATFORM_RECORDS, ExternalMedicalRecord } from '../../data/externalReportsData';
 import { useApp } from '../../context/AppContext';
 import { useEscapeKey } from '../../utils/useEscapeKey';
+import { PatientConsentModal } from '../legal/PatientConsentModal';
 
 export const ExternalRecordsModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   useEscapeKey(onClose);
@@ -23,6 +24,8 @@ export const ExternalRecordsModal: React.FC<{ onClose: () => void }> = ({ onClos
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlatform, setSelectedPlatform] = useState<string>('ALL');
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [hasConsent, setHasConsent] = useState(false);
 
   const platforms = ['ALL', 'Apollo 24|7', 'Practo Health', 'DigiLocker / ABDM', 'Tata 1mg'];
 
@@ -40,12 +43,20 @@ export const ExternalRecordsModal: React.FC<{ onClose: () => void }> = ({ onClos
     return matchesSearch && matchesPlatform;
   });
 
-  const handleSyncAbdm = () => {
+  const executeSync = () => {
     setIsSyncing(true);
     setTimeout(() => {
       setIsSyncing(false);
-      showToast('ABDM Health Gateway refreshed: 4 records synced from Apollo, Practo & CoWIN');
+      showToast('ABDM Health Gateway refreshed: 4 federated records synced via FHIR');
     }, 1200);
+  };
+
+  const handleSyncAbdm = () => {
+    if (!hasConsent) {
+      setShowConsentModal(true);
+      return;
+    }
+    executeSync();
   };
 
   const handleImportToVault = (record: ExternalMedicalRecord) => {
@@ -244,6 +255,17 @@ export const ExternalRecordsModal: React.FC<{ onClose: () => void }> = ({ onClos
           </button>
         </div>
       </div>
+
+      <PatientConsentModal
+        isOpen={showConsentModal}
+        onClose={() => setShowConsentModal(false)}
+        onConsentGranted={() => {
+          setHasConsent(true);
+          executeSync();
+        }}
+        title="Authorize ABDM Health Records Sync"
+        purpose="Synchronize and fetch historical diagnostic lab reports and consultation summaries from DigiLocker, Apollo 24|7, and Practo into your encrypted health locker."
+      />
     </div>
   );
 };

@@ -99,8 +99,11 @@ export const DigitalPrescriptionModal: React.FC = () => {
                 </div>
                 <div className="text-[11px] text-slate-500 mt-0.5">{selectedPrescription.doctorHospital}</div>
               </div>
-              <div className="text-right text-[10px] text-slate-400">
-                <span>Reg: {selectedPrescription.doctorRegNumber}</span>
+              <div className="text-right shrink-0">
+                <span className="inline-block px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-[10px] font-bold shadow-2xs">
+                  NMC Reg: {selectedPrescription.doctorRegNumber}
+                </span>
+                <span className="block text-[9px] text-slate-400 mt-0.5">State Medical Council Verified</span>
               </div>
             </div>
 
@@ -202,8 +205,11 @@ export const DigitalPrescriptionModal: React.FC = () => {
                 <div className="text-xs font-serif font-bold text-slate-800 italic">
                   {selectedPrescription.doctorName}
                 </div>
-                <div className="text-[9px] text-slate-400 uppercase tracking-wider">
-                  Verified Telehealth Practitioner
+                <div className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">
+                  NMC Verified Telehealth Practitioner
+                </div>
+                <div className="text-[8px] text-slate-400 mt-0.5">
+                  Telemedicine Practice Guidelines 2020 Compliant
                 </div>
               </div>
             </div>
